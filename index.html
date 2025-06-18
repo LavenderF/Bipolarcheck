@@ -1,102 +1,159 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>双相情感障碍自我测试 | Bipolar Self-Check</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>双相情感障碍自我测试</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #fffaf3;
+      background-color: #fffdf7;
       color: #333;
-      padding: 20px;
+      padding: 2em;
+      max-width: 800px;
+      margin: auto;
       transition: background 0.3s, color 0.3s;
     }
     body.dark {
-      background: #1e1e1e;
+      background-color: #1e1e1e;
       color: #eaeaea;
     }
-    h1, h2 { color: #4e3c2a; }
-    .dark h1, .dark h2 { color: #ffedc0; }
-    .question { margin-bottom: 20px; }
-    label { display: block; margin-bottom: 5px; }
-    .options { display: flex; flex-wrap: wrap; gap: 10px; }
+    h1 {
+      text-align: center;
+      color: #7c4dff;
+    }
+    body.dark h1 {
+      color: #d6bbff;
+    }
+    .question {
+      margin-bottom: 1.5em;
+      padding: 1em;
+      border-bottom: 1px solid #ccc;
+    }
+    .question p {
+      font-weight: bold;
+    }
+    .question em {
+      font-weight: normal;
+      font-style: italic;
+      font-size: 0.9em;
+      color: #555;
+    }
+    .question div {
+      margin-top: 0.5em;
+    }
+    .question label {
+      margin-right: 1em;
+    }
     button {
-      padding: 10px 20px;
-      background: #ffdca8;
+      display: block;
+      margin: 2em auto;
+      padding: 1em 2em;
+      font-size: 1em;
+      background-color: #7c4dff;
+      color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
     }
-    button:hover { background: #ffcf7d; }
-    .toggle-dark {
+    button:hover {
+      background-color: #5e35b1;
+    }
+    #toggle-dark {
       position: fixed;
       top: 10px;
       right: 10px;
+      background: none;
+      border: none;
+      font-size: 1.5em;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <button class="toggle-dark" onclick="toggleDarkMode()">🌙 切换夜间模式</button>
+  <button id="toggle-dark" onclick="toggleDark()">🌙</button>
 
-  <h1>🧠 双相情感障碍自我评估<br>Bipolar Disorder Self-Check</h1>
-  <p>本测试旨在帮助你更了解自己的情绪节律，并非诊断工具。<br>
-     This test is not a diagnostic tool. Please answer based on your true feelings.</p>
-
-  <form id="quizForm"></form>
-
-  <button type="submit" form="quizForm">提交测试 / Submit</button>
-  <button onclick="window.location.href='journal.html'">📝 前往情绪日记 / Mood Journal</button>
+  <h1>🌗 双相情感障碍自我评估<br><small>Bipolar Self-Assessment</small></h1>
+  <form id="quiz-form">
+    <div id="questions-container"></div>
+    <button type="button" onclick="submitAnswers()">提交 Submit</button>
+  </form>
 
   <script>
-    const questions = Array.from({ length: 40 }, (_, i) => [
-      `问题 ${i + 1}：你是否...（中文）`,
-      `Question ${i + 1}: Do you... (English)`
-    ]);
+    const questions = [
+      ["我在一周内的日常生活节奏变化明显。", "My daily routine changes significantly within a week."],
+      ["我对某些任务的兴趣波动很大。", "My interest in tasks fluctuates significantly."],
+      ["我处理事情的速度有时很快，有时很慢。", "Sometimes I handle things very quickly, sometimes very slowly."],
+      ["我的睡眠时间有时较短，有时较长。", "My sleep duration varies between short and long."],
+      ["我面对相同的事情时反应不一致。", "I react differently to the same situation at different times."],
+      ["我在人际交往中有时很积极，有时会回避。", "In social interactions, I’m sometimes proactive, sometimes avoidant."],
+      ["我在安排时间时，有时很有条理，有时则混乱。", "Sometimes I manage time well, sometimes I don't."],
+      ["我做决定的方式会因时间而不同。", "My decision-making style changes over time."],
+      ["我对未来计划的信心有时强，有时弱。", "My confidence in future plans varies."],
+      ["我对同一件事可能会产生矛盾的感受。", "I may have contradictory feelings about the same thing."],
+      ["我在同一周内可能表现出不同的工作效率。", "My work efficiency may differ within the same week."],
+      ["我有时感到特别愿意社交，有时不愿说话。", "Sometimes I want to socialize a lot, sometimes I prefer silence."],
+      ["我对待压力的方式并不固定。", "My way of handling stress is not consistent."],
+      ["我对日常事物的兴趣变化较大。", "My interest in daily matters varies a lot."],
+      ["我在不同日子里说话的速度和数量会有差别。", "The speed and amount of my speech differ on different days."],
+      ["我有时候会突发灵感，非常高效。", "Sometimes I get bursts of inspiration and work efficiently."],
+      ["我有时候无法开始我计划做的事情。", "Sometimes I can’t start things I planned to do."],
+      ["我在短期内态度和情绪的变化比较明显。", "My attitude and mood shift noticeably in the short term."],
+      ["我对朋友的反应和交流方式经常有变化。", "My response and interaction with friends often change."],
+      ["我对相同建议在不同时间会有不同接受度。", "I respond to the same advice differently at different times."],
+      ["我有时候很爱表达自己，有时候又选择回避。", "Sometimes I love expressing myself, other times I withdraw."],
+      ["我做事的节奏和专注程度变化较大。", "My pace and focus when doing things vary greatly."],
+      ["我在一段时间内容易改变主意。", "I tend to change my mind easily within a short time."],
+      ["我曾在同一个月中经历不同的生活节奏。", "I’ve experienced varying life rhythms within the same month."],
+      ["我在某些时间容易接受新事物，某些时间则排斥。", "I’m more open to new things at some times and more resistant at others."],
+      ["我对熟悉的事情的态度可能变化。", "My attitude toward familiar things can change."],
+      ["我在某些日子表现得极具创造力，某些则否。", "I’m highly creative on some days and not on others."],
+      ["我在人际关系中的主动性有时候很高，有时候很低。", "My initiative in relationships fluctuates."],
+      ["我觉得自己每周的生活感受差异很大。", "My weekly experience of life differs a lot."],
+      ["我处理冲突的方式在短时间内会改变。", "My way of handling conflict can change in a short time."],
+      ["我在同一天内的能量水平可能波动很大。", "My energy levels may fluctuate significantly within the same day."],
+      ["我某些时候更倾向于沉思，某些则冲动。", "Sometimes I prefer reflection, sometimes I act impulsively."],
+      ["我在短时间内表现出的情绪可能反差大。", "My emotional expression may contrast sharply in short time."],
+      ["我对社交的兴趣会明显变化。", "My interest in socializing changes noticeably."],
+      ["我面对挑战的态度不是固定的。", "My attitude toward challenges is not fixed."],
+      ["我在短期内可能多次改变生活重心。", "I may shift my focus in life several times in the short term."],
+      ["我同一天内可能经历不同的情绪节奏。", "I may experience different emotional rhythms within the same day."],
+      ["我有时候感觉特别高效，有时则低落无力。", "Sometimes I feel extremely productive, other times drained."],
+      ["我对人的信任程度有波动。", "My trust in people fluctuates."],
+      ["我对生活节奏的把控感不是持续稳定的。", "My sense of control over life’s rhythm isn’t stable."],
+      ["我对情绪的感知程度会因时间而变化。", "My awareness of emotions changes over time."]
+    ];
 
-    const form = document.getElementById("quizForm");
+    const container = document.getElementById("questions-container");
     questions.forEach((q, i) => {
-      const num = i + 1;
       const div = document.createElement("div");
       div.className = "question";
-      const label = document.createElement("label");
-      label.innerHTML = `${num}. ${q[0]}<br>${q[1]}`;
-      div.appendChild(label);
-
-      const optionsDiv = document.createElement("div");
-      optionsDiv.className = "options";
-      ["从不 / Never", "偶尔 / Rarely", "有时 / Sometimes", "经常 / Often", "总是 / Always"].forEach((txt, idx) => {
-        const radio = document.createElement("input");
-        radio.type = "radio";
-        radio.name = `q${num}`;
-        radio.value = idx + 1;
-        const optionLabel = document.createElement("label");
-        optionLabel.appendChild(radio);
-        optionLabel.append(" " + txt);
-        optionsDiv.appendChild(optionLabel);
-      });
-
-      div.appendChild(optionsDiv);
-      form.appendChild(div);
+      div.innerHTML = `
+        <p>${i + 1}. ${q[0]}<br><em>${q[1]}</em></p>
+        <div>
+          ${[1, 2, 3, 4, 5].map(n => `<label><input type="radio" name="q${i + 1}" value="${n}"> ${n}</label>`).join(" ")}
+        </div>
+      `;
+      container.appendChild(div);
     });
 
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-      let total = 0;
-      for (let i = 1; i <= questions.length; i++) {
-        const val = document.querySelector(`input[name="q${i}"]:checked`);
-        if (!val) return alert("请完成所有题目 / Please complete all questions.");
-        total += parseInt(val.value);
+    function submitAnswers() {
+      const answers = document.querySelectorAll("input[type='radio']:checked");
+      if (answers.length < 40) {
+        alert("请完成所有题目 (Please answer all 40 questions).");
+        return;
       }
-      localStorage.setItem("bipolar_score", total);
-      localStorage.setItem("bipolar_max", questions.length * 5);
+      let score = 0;
+      answers.forEach(a => {
+        score += parseInt(a.value);
+      });
+      localStorage.setItem("bipolarScore", score);
       window.location.href = "result.html";
-    });
+    }
 
-    function toggleDarkMode() {
+    function toggleDark() {
       document.body.classList.toggle("dark");
     }
   </script>
 </body>
 </html>
-
