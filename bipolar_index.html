@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>双相情感障碍自我测试 | Bipolar Self-Check</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { font-family: Arial, sans-serif; background: #fffaf3; color: #333; padding: 20px; }
+    h1, h2 { color: #4e3c2a; }
+    .question { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 5px; }
+    .options { display: flex; gap: 10px; }
+    button { padding: 10px 20px; background: #ffdca8; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #ffcf7d; }
+  </style>
+</head>
+<body>
+  <h1>🧠 双相情感障碍自我评估<br>Bipolar Disorder Self-Check</h1>
+  <p>本测试旨在帮助你更了解自己的情绪节律，并非诊断工具。请依据你真实的感受作答。<br>
+     This test is designed to help you explore your emotional rhythms. It is not a diagnostic tool. Please answer based on your true feelings.</p>
+
+  <form id="quizForm">
+    <div class="question">
+      <label>1. 你是否经历过一种“世界太快/太慢了”的感受？<br>Have you felt that the world is too fast or too slow for you?</label>
+      <div class="options">
+        <label><input type="radio" name="q1" value="1"> 从不 / Never</label>
+        <label><input type="radio" name="q1" value="2"> 偶尔 / Rarely</label>
+        <label><input type="radio" name="q1" value="3"> 有时 / Sometimes</label>
+        <label><input type="radio" name="q1" value="4"> 经常 / Often</label>
+        <label><input type="radio" name="q1" value="5"> 总是 / Always</label>
+      </div>
+    </div>
+
+    <div class="question">
+      <label>2. 你是否突然变得极度充满动力，随后陷入低落？<br>Do you suddenly feel full of energy and then fall into a low mood?</label>
+      <div class="options">
+        <label><input type="radio" name="q2" value="1"> 从不 / Never</label>
+        <label><input type="radio" name="q2" value="2"> 偶尔 / Rarely</label>
+        <label><input type="radio" name="q2" value="3"> 有时 / Sometimes</label>
+        <label><input type="radio" name="q2" value="4"> 经常 / Often</label>
+        <label><input type="radio" name="q2" value="5"> 总是 / Always</label>
+      </div>
+    </div>
+
+    <div class="question">
+      <label>3. 你是否曾觉得自己的思想奔腾得难以控制？<br>Have you ever felt your thoughts racing uncontrollably?</label>
+      <div class="options">
+        <label><input type="radio" name="q3" value="1"> 从不 / Never</label>
+        <label><input type="radio" name="q3" value="2"> 偶尔 / Rarely</label>
+        <label><input type="radio" name="q3" value="3"> 有时 / Sometimes</label>
+        <label><input type="radio" name="q3" value="4"> 经常 / Often</label>
+        <label><input type="radio" name="q3" value="5"> 总是 / Always</label>
+      </div>
+    </div>
+
+    <div class="question">
+      <label>4. 你是否会在短时间内对人产生强烈情感变化？<br>Do you experience intense shifts in feelings toward others in a short time?</label>
+      <div class="options">
+        <label><input type="radio" name="q4" value="1"> 从不 / Never</label>
+        <label><input type="radio" name="q4" value="2"> 偶尔 / Rarely</label>
+        <label><input type="radio" name="q4" value="3"> 有时 / Sometimes</label>
+        <label><input type="radio" name="q4" value="4"> 经常 / Often</label>
+        <label><input type="radio" name="q4" value="5"> 总是 / Always</label>
+      </div>
+    </div>
+
+    <div class="question">
+      <label>5. 你是否在深夜时感到精力异常高涨？<br>Do you feel unusually energized during late night?</label>
+      <div class="options">
+        <label><input type="radio" name="q5" value="1"> 从不 / Never</label>
+        <label><input type="radio" name="q5" value="2"> 偶尔 / Rarely</label>
+        <label><input type="radio" name="q5" value="3"> 有时 / Sometimes</label>
+        <label><input type="radio" name="q5" value="4"> 经常 / Often</label>
+        <label><input type="radio" name="q5" value="5"> 总是 / Always</label>
+      </div>
+    </div>
+
+    <button type="submit">提交测试 / Submit</button>
+  </form>
+
+  <script>
+    document.getElementById("quizForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      let total = 0;
+      for (let i = 1; i <= 5; i++) {
+        let val = document.querySelector(`input[name="q${i}"]:checked`);
+        if (val) total += parseInt(val.value);
+        else return alert("请完成所有题目 / Please complete all questions.");
+      }
+      localStorage.setItem("bipolar_score", total);
+      window.location.href = "result.html";
+    });
+  </script>
+</body>
+</html>
