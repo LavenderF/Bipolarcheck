@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>测试结果 | Bipolar Test Result</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #fdf8f2; padding: 20px; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; text-align: center; }
+    h1 { color: #654321; }
+    .score { font-size: 24px; margin: 20px 0; }
+    .message { font-size: 18px; margin-bottom: 30px; }
+    button {
+      padding: 10px 20px;
+      background: #ffd99f;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover { background: #ffc66d; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎯 你的测试结果<br>Your Test Result</h1>
+    <div class="score" id="scoreDisplay"></div>
+    <div class="message" id="resultMessage"></div>
+    <button onclick="location.href='index.html'">🔁 再测一次 / Retake</button>
+    <button onclick="location.href='journal.html'">📔 写情绪日记 / Write Journal</button>
+  </div>
+
+  <script>
+    const score = localStorage.getItem("bipolar_score");
+    const max = localStorage.getItem("bipolar_max");
+    const scoreDisplay = document.getElementById("scoreDisplay");
+    const resultMessage = document.getElementById("resultMessage");
+
+    if (!score || !max) {
+      scoreDisplay.textContent = "⚠️ 无法读取结果 / Unable to read results.";
+    } else {
+      const percent = (parseInt(score) / parseInt(max)) * 100;
+      scoreDisplay.textContent = `得分 Score: ${score} / ${max} (${percent.toFixed(1)}%)`;
+
+      if (percent < 30) {
+        resultMessage.innerHTML = "你的情绪节律相对平稳。<br>Stable mood, minimal fluctuation.";
+      } else if (percent < 60) {
+        resultMessage.innerHTML = "可能存在一定情绪波动，建议关注。<br>Some emotional shifts, keep track.";
+      } else {
+        resultMessage.innerHTML = "波动较大，建议寻求专业支持。<br>Significant mood swings. Consider help.";
+      }
+    }
+  </script>
+</body>
+</html>
