@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>情绪日记 | Mood Journal</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f9f6f0; padding: 20px; }
+    h1 { color: #3e2e1e; }
+    textarea, input[type=range] { width: 100%; margin-top: 10px; }
+    button { margin-top: 10px; padding: 10px 20px; background: #ffd99f; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #ffc66d; }
+    .entry { margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px; }
+    #chartContainer { margin-top: 40px; }
+  </style>
+</head>
+<body>
+  <h1>📔 情绪日记 Mood Journal</h1>
+  <label>✍️ 日记 / Journal Entry:</label>
+  <textarea id="entryText" rows="5" placeholder="写下你的感受... Write how you feel..."></textarea>
+
+  <label>📈 情绪评分 / Mood Score (1-10): <span id="moodValue">5</span></label>
+  <input type="range" min="1" max="10" value="5" id="moodRange"/>
+
+  <button onclick="saveEntry()">💾 保存 Save</button>
+  <button onclick="exportJournal()">📤 导出 Export</button>
+  <button onclick="clearJournal()">🗑️ 清空 Clear</button>
+  <button onclick="location.href='index.html'">🔙 返回测试首页</button>
+
+  <div id="entries"></div>
+  <div id="chartContainer"><canvas id="moodChart"></canvas></div>
+
+  <script>
+    const moodValue = document.getElementById("moodValue");
+    const moodRange = document.getElementById("moodRange");
+    moodRange.oninput = () => moodValue.textContent = moodRange.value;
+
+    function saveEntry() {
+      const date = new Date().toLocaleDateString();
+      const mood = moodRange.value;
+      const text = document.getElementById("entryText").value.trim();
+      if (!text) return alert("请填写内容");
+
+      const journal = JSON.parse(localStorage.getItem("journal") || "[]");
+      journal.push({ date, mood, text });
+      localStorage.setItem("journal", JSON.stringify(journal));
+      document.getElementById("entryText").value = "";
+      loadEntries();
+    }
+
+    function loadEntries() {
+      const journal = JSON.parse(localStorage.getItem("journal") || "[]");
+      const entriesDiv = document.getElementById("entries");
+      entriesDiv.innerHTML = "<h2>📚 记录 / Entries:</h2>";
+      journal.slice().reverse().forEach(e => {
+        const div = document.createElement("div");
+        div.className = "entry";
+        div.innerHTML = `<strong>${e.date}</strong> | Mood: ${e.mood}<br>${e.text}`;
+        entriesDiv.appendChild(div);
+      });
+      renderChart(journal);
+    }
+
+    function renderChart(data) {
+      const ctx = document.getElementById("moodChart").getContext("2d");
+      const labels = data.map(e => e.date);
+      const scores = data.map(e => e.mood);
+      if (window.moodChart) window.moodChart.destroy();
+      window.moodChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Mood Score',
+            data: scores,
+            borderColor: '#ff9900',
+            backgroundColor: 'rgba(255,153,0,0.2)',
+            tension: 0.3
+          }]
+        },
+        options: {
+          scales: { y: { beginAtZero: true, max: 10 } }
+        }
+      });
+    }
+
+    function exportJournal() {
+      const data = localStorage.getItem("journal") || "[]";
+      const blob = new Blob([data], { type: "application/json" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "mood_journal.json";
+      link.click();
+    }
+
+    function clearJournal() {
+      if (confirm("确定要清空所有记录？")) {
+        localStorage.removeItem("journal");
+        loadEntries();
+      }
+    }
+
+    window.onload = loadEntries;
+  </script>
+</body>
+</html>
